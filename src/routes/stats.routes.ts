@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Fetch all registered employees and their connected devices
-router.get("/employees", async (req: Request, res: Response): any => {
+router.get("/employees", async (req: Request, res: Response): Promise<any> => {
   try {
     const employees = await prisma.employee.findMany({
       include: {
