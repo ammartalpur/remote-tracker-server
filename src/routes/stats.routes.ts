@@ -66,4 +66,24 @@ router.get('/employees/:id/history', async (req, res) => {
   }
 });
 
+router.delete("/employees/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Because of onDelete: Cascade, this one line deletes the
+    // employee AND all their devices AND all their screenshots!
+    await prisma.employee.delete({
+      where: { id },
+    });
+
+    console.log(`🗑️ [Server] Successfully deleted employee: ${id}`);
+    res.json({ success: true, message: "Employee completely removed" });
+  } catch (error) {
+    console.error("❌ [Server] Delete error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete employee" });
+  }
+});
+
 export default router;

@@ -25,7 +25,6 @@ export const handleConnection = async (io: Server, socket: Socket) => {
       if (device && device.isVerified) {
         socket.join(`device:${deviceId}`);
 
-        // --- NEW: TIME TRACKING (CLOCK-IN) ---
         // Create a new session for this exact connection
         const currentSession = await prisma.session.create({
           data: { deviceId: device.id },
@@ -59,15 +58,12 @@ export const handleConnection = async (io: Server, socket: Socket) => {
     }
   }
 
-  // --- NEW: HISTORY LOGGING (ACTIVE APP) ---
+
   // --- HISTORY LOGGING (ACTIVE APP) ---
   socket.on(
     "agent:update_app",
     async (payload: { deviceId: string; appName: string }) => {
-      // 🚀 THE LOG YOU REQUESTED
-      console.log(
-        `[Telemetry] Received app update -> Device: ${payload.deviceId} | App: ${payload.appName}`,
-      );
+      
 
       try {
         await prisma.device.update({

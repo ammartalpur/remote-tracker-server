@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,50 +9,60 @@ datasource db {
 }
 
 model Employee {
-  id          String   @id @default(uuid())
-  name        String?  // Initially null during pairing, filled out by owner later
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String       @id @default(uuid())
+  name        String? // Initially null during pairing, filled out by owner later
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  screenshots Screenshot[]
   devices     Device[]
 }
 
 model Device {
-  id           String   @id @default(uuid())
-  employeeId   String
-  employee     Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  
-  hostname     String   // Desktop name (e.g., DESKTOP-AMMAR-92)
-  os           String   // Operating System
-  macAddress   String   @unique // Permanent hardware identifier
-  lastIp       String   // Last known public IP
-  location     String   // Calculated physical location (City, Country)
-  authToken    String   @unique // Secure JWT token for automatic reconnection
-  activeApp    String?
-  isVerified   Boolean  @default(false)
-  isActive     Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String   @id @default(uuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
-  sessions     Session[]
+  hostname   String // Desktop name (e.g., DESKTOP-AMMAR-92)
+  os         String // Operating System
+  macAddress String   @unique // Permanent hardware identifier
+  lastIp     String // Last known public IP
+  location   String // Calculated physical location (City, Country)
+  authToken  String   @unique // Secure JWT token for automatic reconnection
+  activeApp  String?
+  isVerified Boolean  @default(false)
+  isActive   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sessions Session[]
 }
 
 model Session {
-  id          String        @id @default(uuid())
-  deviceId    String
-  device      Device        @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  
-  startedAt   DateTime      @default(now())
-  endedAt     DateTime?     // Remains null while they are online
-  durationMin Int?          // Calculated automatically when they disconnect
-  
-  activities  ActivityLog[] // Links to the apps they used during this specific session
+  id       String @id @default(uuid())
+  deviceId String
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime? // Remains null while they are online
+  durationMin Int? // Calculated automatically when they disconnect
+
+  activities ActivityLog[] // Links to the apps they used during this specific session
 }
 
 model ActivityLog {
-  id          String   @id @default(uuid())
-  sessionId   String
-  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  
-  appName     String   // e.g., "Visual Studio Code"
-  timestamp   DateTime @default(now()) // The exact moment they switched to this app
+  id        String  @id @default(uuid())
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  appName   String // e.g., "Visual Studio Code"
+  timestamp DateTime @default(now()) // The exact moment they switched to this app
+}
+
+model Screenshot {
+  id         String   @id @default(uuid())
+  employeeId String
+  imageUrl   String // Will store the Cloudinary URL
+  createdAt  DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }
